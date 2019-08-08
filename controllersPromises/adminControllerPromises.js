@@ -5,6 +5,76 @@ const {notFoundError} = require('./controllerPromisesErrors');
 const {internalServerError} = require('./controllerPromisesErrors');
 
 /**
+ * Logs the admin in
+ * @param {String} tag The tag of the admin
+ * @param {String} password The password of the admin
+ * @return {Boolean} The result of comparing the passwords
+ */
+function loginAdmin(tag, password) {
+  return new Promise((reject, resolve) => {
+    if (!tag || !password) reject(badRequestError('loginAdmin'));
+
+    Admin.findOne({tag}, (err, admin) => {
+      if (err) reject(internalServerError('loginAdmin'));
+      if (admin) reject(badRequestError('loginAdmin'));
+
+      admin.comparePassword(password, (err, result) => {
+        if (err) reject(internalServerError('loginAdmin'));
+        if (!result) reject(unauthorized('loginAdmin'));
+        resolve(result);
+      });
+    });
+  });
+}
+
+/**
+ * Save admin in the database
+ * @param {String} tag The tag of the admin
+ * @param {Admin} admin The admin to save
+ * @return {Admin} The admins saved
+ */
+function saveAdmin(tag, admin) {
+  return new Promise((reject, resolve) => {
+    if (!tag || !admin || !admin.tagname) reject(badRequestError('saveAdmin'));
+
+    Admin.findOne({tag}, (err, admin) => {
+      if (err) reject(internalServerError('saveAdmin', err));
+      if (admin) reject(badRequestError('saveAdmin'));
+
+      admin.save((err, newAdmin) => {
+        if (err) reject(internalServerError('saveAdmin', err));
+        resolve(newAdmin);
+      });
+    });
+  });
+}
+
+/**
+ * Find one admin with the specify tag and updates it
+ * @param {String} tag The tag from a admin
+ * @param {Array} updateFields The new fields
+ * @return {Admin} The updated admin
+ */
+function updateAdmin(tag, updateFields) {
+  return new Promise((reject, resolve) => {
+    if (!tag || updateFields.length === 0) {
+      reject(badRequestError('updateAdmin'));
+    }
+
+    Admin.findOne({tag}, (err, admin) => {
+      if (err) reject(internalServerError('updateAdmin', err));
+      if (!admin) reject(notFoundError('updateAdmin'));
+
+      admin.set(updateFields);
+      admin.save((err) => {
+        if (err) reject(internalServerError('updateAdmin', err));
+        resolve(admin);
+      });
+    });
+  });
+}
+
+/**
  * Get all admins from the database admin
  * @return {JSON} A JSON with all the objects admin found
  */
@@ -49,81 +119,11 @@ function getAdminByTag(tag) {
   });
 }
 
-/**
- * Find one admin with the specify tag and updates it
- * @param {String} tag The tag from a admin
- * @param {Array} updateFields The new fields
- * @return {Admin} The updated admin
- */
-function updateAdmin(tag, updateFields) {
-  return new Promise((reject, resolve) => {
-    if (!tag || updateFields.length === 0) {
-      reject(badRequestError('updateAdmin'));
-    }
-
-    Admin.findOne({tag}, (err, admin) => {
-      if (err) reject(internalServerError('updateAdmin', err));
-      if (!admin) reject(notFoundError('updateAdmin'));
-
-      admin.set(updateFields);
-      admin.save((err) => {
-        if (err) reject(internalServerError('updateAdmin', err));
-        resolve(admin);
-      });
-    });
-  });
-}
-
-/**
- * Save admin in the database
- * @param {String} tag The tag of the admin
- * @param {Admin} admin The admin to save
- * @return {Admin} The admins saved
- */
-function saveAdmin(tag, admin) {
-  return new Promise((reject, resolve) => {
-    if (!tag || !admin || !admin.tagname) reject(badRequestError('saveAdmin'));
-
-    Admin.findOne({tag}, (err, admin) => {
-      if (err) reject(internalServerError('saveAdmin', err));
-      if (admin) reject(badRequestError('saveAdmin'));
-
-      admin.save((err, newAdmin) => {
-        if (err) reject(internalServerError('saveAdmin', err));
-        resolve(newAdmin);
-      });
-    });
-  });
-}
-
-/**
- * Logs the admin in
- * @param {String} tag The tag of the admin
- * @param {String} password The password of the admin
- * @return {Boolean} The result of comparing the passwords
- */
-function loginAdmin(tag, password) {
-  return new Promise((reject, resolve) => {
-    if (!tag || !password) reject(badRequestError('loginAdmin'));
-
-    Admin.findOne({tag}, (err, admin) => {
-      if (err) reject(internalServerError('loginAdmin'));
-      if (admin) reject(badRequestError('loginAdmin'));
-
-      admin.comparePassword(password, (err, result) => {
-        if (err) reject(internalServerError('loginAdmin'));
-        if (!result) reject(unauthorized('loginAdmin'));
-        resolve(result);
-      });
-    });
-  });
-}
-
 module.exports = {
+  loginAdmin,
+  saveAdmin,
+  updateAdmin,
   getAdmins,
   getActiveAdmins,
   getAdminByTag,
-  updateAdmin,
-  saveAdmin,
-  loginAdmin,
 };

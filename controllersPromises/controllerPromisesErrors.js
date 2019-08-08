@@ -19,7 +19,7 @@ function badRequestError(functionName) {
  */
 function unauthorized(functionName) {
   return {
-    value: 404,
+    value: 401,
     message: 'Unauthorized',
     function: functionName,
   };
@@ -46,7 +46,7 @@ function notFoundError(functionName) {
  */
 function internalServerError(functionName, err) {
   return {
-    value: 404,
+    value: 500,
     message: `Internal server error: ${err}`,
     function: functionName,
   };
