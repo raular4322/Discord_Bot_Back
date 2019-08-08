@@ -1,0 +1,35 @@
+{
+  "name": "discord_bot_back",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "bcrypt": "^3.0.6",
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "jwt-simple": "^0.5.6",
+    "moment": "^2.24.0",
+    "mongoose": "^5.6.8",
+    "nodemon": "^1.19.1"
+  },
+  "devDependencies": {
+    "eslint": "^6.1.0",
+    "eslint-config-google": "^0.13.0",
+    "eslint-plugin-import": "^2.18.2",
+    "jsdoc": "^3.6.3"
+  },
+  "scripts": {
+    "start": "nodemon index.js",
+    "test": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/raular4322/Discord_Bot_Back.git"
+  },
+  "author": "Raular4322",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/raular4322/Discord_Bot_Back/issues"
+  },
+  "homepage": "https://github.com/raular4322/Discord_Bot_Back#readme"
+}
