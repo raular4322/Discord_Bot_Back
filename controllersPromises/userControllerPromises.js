@@ -11,7 +11,7 @@ function getUsers() {
   return new Promise((reject, resolve) => {
     User.find({}, (err, users) => {
       if (err) reject(internalServerError('getUsers', err));
-      if (!users) reject(notFoundError('getUsers'));
+      if (users.length === 0) reject(notFoundError('getUsers'));
       resolve(users);
     });
   });
@@ -25,7 +25,7 @@ function getActiveUsers() {
   return new Promise((reject, resolve) => {
     User.find({active: true}, (err, users) => {
       if (err) reject(internalServerError('getActiveUsers', err));
-      if (!users) reject(notFoundError('getActiveUsers'));
+      if (users.length === 0) reject(notFoundError('getActiveUsers'));
       resolve(users);
     });
   });
@@ -40,7 +40,7 @@ function getUserByTag(tag) {
   return new Promise((reject, resolve) => {
     if (!tag) reject(badRequestError('getUserByTag'));
 
-    User.find({tag}, (err, user) => {
+    User.findOne({tag}, (err, user) => {
       if (err) reject(internalServerError('getUserByTag', err));
       if (!user) reject(notFoundError('getUserByTag'));
       resolve(user);
@@ -60,7 +60,7 @@ function updateUser(tag, updateFields) {
       reject(badRequestError('updateUser'));
     }
 
-    User.find({tag}, (err, user) => {
+    User.findOne({tag}, (err, user) => {
       if (err) reject(internalServerError('updateUser', err));
       if (!user) reject(notFoundError('updateUser'));
 
@@ -83,9 +83,9 @@ function saveUser(tag, user) {
   return new Promise((reject, resolve) => {
     if (!tag || !user || !user.tagname) reject(badRequestError('saveUser'));
 
-    User.find({tag}, (err, user) => {
+    User.findOne({tag}, (err, user) => {
       if (err) reject(internalServerError('saveUser', err));
-      if (user.length >= 0) reject(badRequestError('saveUser'));
+      if (!user) reject(badRequestError('saveUser'));
 
       user.save((err, newUser) => {
         if (err) reject(internalServerError('saveUser', err));

@@ -1,26 +1,22 @@
 const Admin = require('../models/adminModel');
-const adminPromises = require('../controllers_promises/adminControllerPromises');
+const adminPromises = require('../controllersPromises/adminControllerPromises');
 
 /**
  * Login
- * @param {JSON} req The request to the api with the user data to login
+ * @param {JSON} req The request to the api with the data to login
  * @param {JSON} res The response from the api
  */
 function login(req, res) {
   const {tag} = req.body;
   const {password} = req.body;
 
-  Admin.findOne({tag}, (err, admin) => {
-    if (err) return res.status(500).send({message: `Error: ${err}`});
-    if (!admin) return res.status(404).send({message: 'No user found'});
-
-    admin.comparePassword(password, (err, isMatch) => {
-      if (err) return res.status(500).send({message: `Error: ${err}`});
-      if (!isMatch) return res.status(401).send({message: 'Unothorized'});
-
-      return res.status(200).send([admin]);
-    });
-  });
+  adminPromises.loginAdmin(tag, password)
+      .then((response) => {
+        return res.status(response);
+      })
+      .catch((err) => {
+        return res.status(err.value).send(err.message);
+      });
 }
 
 /**
@@ -34,34 +30,28 @@ function signUp(req, res) {
   const {tagname} = req.body;
   const {password} = req.body;
 
-  // Checks if the user already exist
-  Admin.findOne({tag}, (err, admin) => {
-    if (err) return res.status(500).send({message: `Error: ${err}`});
-    if (admin) return res.status(409).send({message: 'Admin already exist'});
-
-    const newAdmin = new Admin({
-      nickname,
-      tag,
-      tagname,
-      password,
-    });
-
-    // Save the new user
-    newAdmin.save((error, newAdmin) => {
-      if (error) return res.status(500).send({message: `Error: ${error}`});
-      if (!newAdmin) return res.status(500).send({message: 'No Admin saved'});
-
-      return res.status(200).send({message: 'Saved'});
-    });
+  const newAdmin = new Admin({
+    nickname,
+    tag,
+    tagname,
+    password,
   });
+
+  adminPromises.saveAdmin(tag, newAdmin)
+      .then((response) => {
+        return res.send(response);
+      })
+      .catch((err) => {
+        return res.status(err.value).send(err.message);
+      });
 }
 
 /**
- * Update the user information
- * @param {JSON} req The request to the api with the user data to update a user
+ * Update the admin information
+ * @param {JSON} req The request to the api with the data to update an admin
  * @param {JSON} res The response from the api
  */
-function updateUser(req, res) {
+function updateAdmin(req, res) {
   const {tag} = req.body;
   const {nickname} = req.body;
   const {tagname} = req.body;
@@ -71,7 +61,6 @@ function updateUser(req, res) {
   const {bans} = req.body;
   const {password} = req.body;
 
-  // Get the new information
   if (nickname) updatedFields.nickname = nickname;
   if (tagname) updatedFields.tagname = tagname;
   if (joinDate) updatedFields.joinDate = joinDate;
@@ -80,49 +69,51 @@ function updateUser(req, res) {
   if (bans) updatedFields.bans = bans;
   if (password) updatedFields.password = password;
 
-  // Update the user
-  Admin.findOneAndUpdate({tag}, updatedFields, (err, updatedAdmin) => {
-    if (err) return res.status(500).send({message: `Error: ${err}`});
-    if (!user) return res.status(404).send({message: 'Admin not found'});
-
-    return res.status(200).send({message: updatedAdmin});
-  });
+  adminPromises.updateAdmin(tag, updatedFields)
+      .then((response) => {
+        return res.send(response);
+      })
+      .catch((err) => {
+        return res.status(err.value).send(err.message);
+      });
 }
 
 /**
- * Get all users from database
- * @param {JSON} req The request to the api with the user data to get all users
+ * Get all admins from database
+ * @param {JSON} req The request to the api with the data to get all admins
  * @param {JSON} res The response from the api
  */
 function getAdmins(req, res) {
-  Admin.find({}, (err, admins) => {
-    if (err) return res.status(500).send({message: `Error: ${err}`});
-    if (!admins) return res.status(404).send({message: 'No admins found'});
-
-    return res.status(200).send(admins);
-  });
+  adminPromises.getAdmins()
+      .then((response) => {
+        return res.send(response);
+      })
+      .catch((err) => {
+        return res.status(err.value).send(err.message);
+      });
 }
 
 /**
- * Get all users from database
- * @param {JSON} req The request to the api with the user data to get all users
+ * Get all admins from database
+ * @param {JSON} req The request to the api with the data to get all admins
  * @param {JSON} res The response from the api
  */
 function getAdmin(req, res) {
   const {tag} = req.params;
 
-  Admin.findOne({tag}, (err, admin) => {
-    if (err) return res.status(500).send({message: `Error: ${err}`});
-    if (!admin) return res.status(404).send({message: 'No user found'});
-
-    return res.status(200).send([admin]);
-  });
+  adminPromises.getAdminByTag(tag)
+      .then((response) => {
+        return res.send(response);
+      })
+      .catch((err) => {
+        return res.status(err.value).send(err.message);
+      });
 }
 
 module.exports = {
   signUp,
   login,
-  updateUser,
+  updateAdmin,
   getAdmins,
   getAdmin,
 };

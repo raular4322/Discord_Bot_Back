@@ -1,5 +1,5 @@
 const User = require('../models/userModel');
-const userPromises = require('../controllers_promises/userControllerPromises');
+const userPromises = require('../controllersPromises/userControllerPromises');
 
 /**
  * Create and save a new user
@@ -60,7 +60,7 @@ function updateUser(req, res) {
 
 /**
  * Get all users from database
- * @param {JSON} req The request to the api with the user data to get all users
+ * @param {JSON} req The request to the api with the data to get all users
  * @param {JSON} res The response from the api
  */
 function getUsers(req, res) {
@@ -75,7 +75,7 @@ function getUsers(req, res) {
 
 /**
  * Get all users from database
- * @param {JSON} req The request to the api with the user data to get all users
+ * @param {JSON} req The request to the api with the data to get all users
  * @param {JSON} res The response from the api
  */
 function getUser(req, res) {
