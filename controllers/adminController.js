@@ -1,4 +1,5 @@
 const Admin = require('../models/adminModel');
+const adminPromises = require('../controllers_promises/adminControllerPromises');
 
 /**
  * Login
@@ -13,7 +14,7 @@ function login(req, res) {
     if (err) return res.status(500).send({message: `Error: ${err}`});
     if (!admin) return res.status(404).send({message: 'No user found'});
 
-    user.comparePassword(password, (err, isMatch) => {
+    admin.comparePassword(password, (err, isMatch) => {
       if (err) return res.status(500).send({message: `Error: ${err}`});
       if (!isMatch) return res.status(401).send({message: 'Unothorized'});
 
@@ -38,7 +39,7 @@ function signUp(req, res) {
     if (err) return res.status(500).send({message: `Error: ${err}`});
     if (admin) return res.status(409).send({message: 'Admin already exist'});
 
-    const Admin = new Admin({
+    const newAdmin = new Admin({
       nickname,
       tag,
       tagname,
@@ -46,7 +47,7 @@ function signUp(req, res) {
     });
 
     // Save the new user
-    Admin.save((error, newAdmin) => {
+    newAdmin.save((error, newAdmin) => {
       if (error) return res.status(500).send({message: `Error: ${error}`});
       if (!newAdmin) return res.status(500).send({message: 'No Admin saved'});
 
