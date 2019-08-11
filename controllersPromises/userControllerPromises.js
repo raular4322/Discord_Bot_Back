@@ -8,7 +8,7 @@ const {internalServerError} = require('./controllerPromisesErrors');
  * @return {JSON} A JSON with all the objects User found
  */
 function getUsers() {
-  return new Promise((reject, resolve) => {
+  return new Promise((resolve, reject) => {
     User.find({}, (err, users) => {
       if (err) reject(internalServerError('getUsers', err));
       if (users.length === 0) reject(notFoundError('getUsers'));
@@ -22,7 +22,7 @@ function getUsers() {
  * @return {JSON} A JSON with all the objects User found
  */
 function getActiveUsers() {
-  return new Promise((reject, resolve) => {
+  return new Promise((resolve, reject) => {
     User.find({active: true}, (err, users) => {
       if (err) reject(internalServerError('getActiveUsers', err));
       if (users.length === 0) reject(notFoundError('getActiveUsers'));
@@ -37,7 +37,7 @@ function getActiveUsers() {
  * @return {User} A object User
  */
 function getUserByTag(tag) {
-  return new Promise((reject, resolve) => {
+  return new Promise((resolve, reject) => {
     if (!tag) reject(badRequestError('getUserByTag'));
 
     User.findOne({tag}, (err, user) => {
@@ -55,7 +55,7 @@ function getUserByTag(tag) {
  * @return {User} The updated user
  */
 function updateUser(tag, updateFields) {
-  return new Promise((reject, resolve) => {
+  return new Promise((resolve, reject) => {
     if (!tag || updateFields.length === 0) {
       reject(badRequestError('updateUser'));
     }
@@ -80,7 +80,7 @@ function updateUser(tag, updateFields) {
  * @return {User} The users saved
  */
 function saveUser(tag, user) {
-  return new Promise((reject, resolve) => {
+  return new Promise((resolve, reject) => {
     if (!tag || !user || !user.tagname) reject(badRequestError('saveUser'));
 
     User.findOne({tag}, (err, user) => {

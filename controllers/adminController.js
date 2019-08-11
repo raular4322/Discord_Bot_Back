@@ -1,18 +1,23 @@
 const Admin = require('../models/adminModel');
 const adminPromises = require('../controllersPromises/adminControllerPromises');
+const Token = require('../services/tokenService');
 
 /**
  * Login
  * @param {JSON} req The request to the api with the data to login
- * @param {JSON} res The response from the api
+ * @param {JSON} res The api response
  */
 function login(req, res) {
   const {tag} = req.body;
   const {password} = req.body;
 
   adminPromises.loginAdmin(tag, password)
-      .then((response) => {
-        return res.status(response);
+      .then((admin) => {
+        const response = {
+          admin,
+          token: Token.generateToken(admin),
+        };
+        return res.send(response);
       })
       .catch((err) => {
         return res.status(err.value).send(err.message);
@@ -22,7 +27,7 @@ function login(req, res) {
 /**
  * Create and save a new Admin
  * @param {JSON} req The request to the api with the Admin data to save
- * @param {JSON} res The response from the api
+ * @param {JSON} res The api response
  */
 function signUp(req, res) {
   const {nickname} = req.body;
@@ -49,7 +54,7 @@ function signUp(req, res) {
 /**
  * Update the admin information
  * @param {JSON} req The request to the api with the data to update an admin
- * @param {JSON} res The response from the api
+ * @param {JSON} res The api response
  */
 function updateAdmin(req, res) {
   const {tag} = req.body;
@@ -81,7 +86,7 @@ function updateAdmin(req, res) {
 /**
  * Get all admins from database
  * @param {JSON} req The request to the api with the data to get all admins
- * @param {JSON} res The response from the api
+ * @param {JSON} res The api response
  */
 function getAdmins(req, res) {
   adminPromises.getAdmins()
@@ -96,7 +101,7 @@ function getAdmins(req, res) {
 /**
  * Get all admins from database
  * @param {JSON} req The request to the api with the data to get all admins
- * @param {JSON} res The response from the api
+ * @param {JSON} res The api response
  */
 function getAdmin(req, res) {
   const {tag} = req.params;

@@ -2,6 +2,10 @@ const crypto = require('crypto');
 const config = require('../config');
 const jwt = require('jwt-simple');
 const moment = require('moment');
+const {
+  badRequestError,
+  unauthorized,
+} = require('../controllersPromises/controllerPromisesErrors');
 
 /**
  * Encrypts the text
@@ -49,13 +53,16 @@ function generateToken(admin) {
  * @return {String} The Admin's tag from the token
  */
 function decodeToken(token) {
-  try {
-    const payload = jwt.decode(token, config.SECRET_TOKEN);
-    if (payload.exp <= moment().unix()) return 'unothorized';
-    return decrypt(payload.sub);
-  } catch (err) {
-    return err;
-  }
+  return new Promise((resolve, reject) => {
+    try {
+      const payload = jwt.decode(token, config.SECRET_TOKEN);
+      if (payload.exp <= moment().unix()) reject(unauthorized('decodeToken'));
+      const userTag = decrypt(payload.sub);
+      resolve(userTag);
+    } catch (err) {
+      reject(badRequestError('decodeToken'));
+    }
+  });
 };
 
 module.exports = {

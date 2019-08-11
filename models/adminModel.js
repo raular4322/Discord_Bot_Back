@@ -22,7 +22,7 @@ const adminSchema = new Schema({
   active: {type: Boolean},
 });
 
-adminSchema.pre('save', (next) => {
+adminSchema.pre('save', function(next) {
   const admin = this;
   if (!admin.isModified('password')) return next();
   bcrypt.genSalt((err, salt) => {
@@ -36,7 +36,7 @@ adminSchema.pre('save', (next) => {
   });
 });
 
-AdminSchema.methods.comparePassword = function(candidatePassword, result) {
+adminSchema.methods.comparePassword = function(candidatePassword, result) {
   bcrypt.compare(candidatePassword, this.password, (err, isMatch) => {
     result(err, isMatch);
   });

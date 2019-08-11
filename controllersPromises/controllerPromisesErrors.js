@@ -1,12 +1,13 @@
 /**
  * 400, bad request response
  * @param {String} functionName The name of the function to specify the error
+ * @param {err} err The output of the error
  * @return {JSON} All the information needed from the error
  */
-function badRequestError(functionName) {
+function badRequestError(functionName, err) {
   return {
     value: 400,
-    message: 'Bad request',
+    message: `Bad request: ${err}`,
     function: functionName,
   };
 };
@@ -17,7 +18,7 @@ function badRequestError(functionName) {
  * @param {err} err The output of the error
  * @return {JSON} All the information needed from the error
  */
-function unauthorized(functionName) {
+function unauthorized(functionName, err) {
   return {
     value: 401,
     message: 'Unauthorized',
@@ -28,12 +29,13 @@ function unauthorized(functionName) {
 /**
  * 404, not found response
  * @param {String} functionName The name of the function to specify the error
+ * @param {String} err The output of the error
  * @return {JSON} All the information needed from the error
  */
-function notFoundError(functionName) {
+function notFoundError(functionName, err) {
   return {
     value: 404,
-    message: 'Not found',
+    message: `Not found: ${err}`,
     function: functionName,
   };
 };
