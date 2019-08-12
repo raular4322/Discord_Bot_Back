@@ -28,8 +28,8 @@ function encrypt(text) {
 function decrypt(text) {
   const iv = Buffer.from(config.IV, 'hex');
   const decipher = crypto.createDecipheriv(config.ALGORITHM, config.KEY, iv);
-  let decrypted = decipher.update(text, 'utf8', 'hex');
-  decrypted += decipher.final('hex');
+  let decrypted = decipher.update(text, 'hex', 'utf8');
+  decrypted += decipher.final('utf8');
   return decrypted;
 }
 
@@ -56,6 +56,10 @@ function decodeToken(token) {
   return new Promise((resolve, reject) => {
     try {
       const payload = jwt.decode(token, config.SECRET_TOKEN);
+      console.log(JSON.stringify(payload))
+      console.log(payload.exp)
+      console.log(moment().unix())
+      console.log(payload.exp <= moment().unix())
       if (payload.exp <= moment().unix()) reject(unauthorized('decodeToken'));
       const userTag = decrypt(payload.sub);
       resolve(userTag);

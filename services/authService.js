@@ -17,11 +17,13 @@ function auth(req, res, next) {
   const {token} = req.headers;
 
   if (!token) {
-    return badRequestError('auth');
+    const err = badRequestError('auth', 'missing token');
+    return res.status(err.value).send(err.message);
   };
 
   Token.decodeToken(token)
       .then((result) => {
+        console.log(result)
         Admin.findOne({tag: result}, (err, admin) => {
           if (err) return internalServerError('decodeToken');
           if (!admin) return unauthorized('decodeToken');
@@ -29,6 +31,7 @@ function auth(req, res, next) {
         });
       })
       .catch((err) => {
+        console.log(err)
         return res.send(err);
       });
 };
