@@ -1,7 +1,7 @@
 const Admin = require('../models/adminModel');
 const adminPromises = require('../controllersPromises/adminControllerPromises');
 const Token = require('../services/tokenService');
-
+const config = require('../config');
 /**
  * Login
  * @param {JSON} req The request to the api with the data to login
@@ -10,18 +10,21 @@ const Token = require('../services/tokenService');
 function login(req, res) {
   const {tag} = req.body;
   const {password} = req.body;
+  const {masterKey} = req.body;
 
-  adminPromises.loginAdmin(tag, password)
-      .then((admin) => {
-        const response = {
-          admin,
-          token: Token.generateToken(admin),
-        };
-        return res.send(response);
-      })
-      .catch((err) => {
-        return res.status(err.value).send(err.message);
-      });
+  if (masterKey === config.MASTERKEY) {
+    adminPromises.loginAdmin(tag, password)
+        .then((admin) => {
+          const response = {
+            admin,
+            token: Token.generateToken(admin),
+          };
+          return res.send(response);
+        })
+        .catch((err) => {
+          return res.status(err.value).send(err.message);
+        });
+  }
 }
 
 /**
