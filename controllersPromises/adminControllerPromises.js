@@ -1,8 +1,8 @@
 const Admin = require('../models/adminModel');
 const {
-  badRequestError,
+  badRequest,
   unauthorized,
-  notFoundError,
+  notFound,
   internalServerError,
 } = require('./controllerPromisesErrors');
 
@@ -15,16 +15,29 @@ const {
 function loginAdmin(tag, password) {
   return new Promise((resolve, reject) => {
     if (!tag || !password) {
-      reject(badRequestError('loginAdmin', 'missing params'));
+      reject(badRequest('loginAdmin', 'missing params'));
+      return;
     }
 
     Admin.findOne({tag}, (err, admin) => {
-      if (err) reject(internalServerError('loginAdmin'));
-      if (!admin) reject(badRequestError('loginAdmin'));
+      if (err) {
+        reject(internalServerError('loginAdmin'));
+        return;
+      }
+      if (!admin) {
+        reject(badRequest('loginAdmin'));
+        return;
+      }
 
       admin.comparePassword(password, (err, result) => {
-        if (err) reject(internalServerError('loginAdmin'));
-        if (!result) reject(unauthorized('loginAdmin'));
+        if (err) {
+          reject(internalServerError('loginAdmin'));
+          return;
+        }
+        if (!result) {
+          reject(unauthorized('loginAdmin'));
+          return;
+        }
         resolve(admin);
       });
     });
@@ -40,15 +53,25 @@ function loginAdmin(tag, password) {
 function saveAdmin(tag, adminToSave) {
   return new Promise((resolve, reject) => {
     if (!tag || !adminToSave || !adminToSave.tagname) {
-      reject(badRequestError('saveAdmin'));
+      reject(badRequest('saveAdmin', 'missing params'));
+      return;
     }
 
     Admin.findOne({tag}, (err, admin) => {
-      if (err) reject(internalServerError('saveAdmin', err));
-      if (admin) reject(badRequestError('saveAdmin'));
+      if (err) {
+        reject(internalServerError('saveAdmin', err));
+        return;
+      }
+      if (admin) {
+        reject(badRequest('saveAdmin', 'admin already exist'));
+        return;
+      }
 
       adminToSave.save((err, newAdmin) => {
-        if (err) reject(internalServerError('saveAdmin', err));
+        if (err) {
+          reject(internalServerError('saveAdmin', err));
+          return;
+        }
         resolve(newAdmin);
       });
     });
@@ -64,16 +87,26 @@ function saveAdmin(tag, adminToSave) {
 function updateAdmin(tag, updateFields) {
   return new Promise((resolve, reject) => {
     if (!tag || updateFields.length === 0) {
-      reject(badRequestError('updateAdmin'));
+      reject(badRequest('updateAdmin', 'missing params'));
+      return;
     }
 
     Admin.findOne({tag}, (err, admin) => {
-      if (err) reject(internalServerError('updateAdmin', err));
-      if (!admin) reject(notFoundError('updateAdmin'));
+      if (err) {
+        reject(internalServerError('updateAdmin', err));
+        return;
+      }
+      if (!admin) {
+        reject(notFound('updateAdmin', 'no admin found'));
+        return;
+      }
 
       admin.set(updateFields);
       admin.save((err) => {
-        if (err) reject(internalServerError('updateAdmin', err));
+        if (err) {
+          reject(internalServerError('updateAdmin', err));
+          return;
+        }
         resolve(admin);
       });
     });
@@ -87,8 +120,14 @@ function updateAdmin(tag, updateFields) {
 function getAdmins() {
   return new Promise((resolve, reject) => {
     Admin.find({}, (err, admins) => {
-      if (err) reject(internalServerError('getAdmins', err));
-      if (!admins) reject(notFoundError('getAdmins'));
+      if (err) {
+        reject(internalServerError('getAdmins', err));
+        return;
+      }
+      if (!admins.length === 0) {
+        reject(notFound('getAdmins', 'no admins found'));
+        return;
+      }
       resolve(admins);
     });
   });
@@ -101,8 +140,14 @@ function getAdmins() {
 function getActiveAdmins() {
   return new Promise((resolve, reject) => {
     Admin.find({active: true}, (err, admins) => {
-      if (err) reject(internalServerError('getActiveAdmins', err));
-      if (!admins) reject(notFoundError('getActiveAdmins'));
+      if (err) {
+        reject(internalServerError('getActiveAdmins', err));
+        return;
+      }
+      if (!!admins.length === 0) {
+        reject(notFound('getActiveAdmins', 'no admins found'));
+        return;
+      }
       resolve(admins);
     });
   });
@@ -115,11 +160,20 @@ function getActiveAdmins() {
  */
 function getAdminByTag(tag) {
   return new Promise((resolve, reject) => {
-    if (!tag) reject(badRequestError('getAdminByTag'));
+    if (!tag) {
+      reject(badRequest('getAdminByTag', 'missing params'));
+      return;
+    }
 
     Admin.findOne({tag}, (err, admin) => {
-      if (err) reject(internalServerError('getAdminByTag', err));
-      if (!admin) reject(notFoundError('getAdminByTag'));
+      if (err) {
+        reject(internalServerError('getAdminByTag', err));
+        return;
+      }
+      if (!admin) {
+        reject(notFound('getAdminByTag', 'no admin found'));
+        return;
+      }
       resolve(admin);
     });
   });

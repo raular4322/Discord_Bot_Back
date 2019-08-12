@@ -4,7 +4,7 @@
  * @param {err} err The output of the error
  * @return {JSON} All the information needed from the error
  */
-function badRequestError(functionName, err) {
+function badRequest(functionName, err) {
   return {
     value: 400,
     message: `Bad request: ${err}`,
@@ -32,7 +32,7 @@ function unauthorized(functionName, err) {
  * @param {String} err The output of the error
  * @return {JSON} All the information needed from the error
  */
-function notFoundError(functionName, err) {
+function notFound(functionName, err) {
   return {
     value: 404,
     message: `Not found: ${err}`,
@@ -56,8 +56,8 @@ function internalServerError(functionName, err) {
 
 
 module.exports = {
-  badRequestError,
+  badRequest,
   unauthorized,
-  notFoundError,
+  notFound,
   internalServerError,
 };

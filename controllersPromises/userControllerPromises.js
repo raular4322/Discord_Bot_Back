@@ -1,49 +1,40 @@
 const User = require('../models/userModel');
-const {badRequestError} = require('./controllerPromisesErrors');
-const {notFoundError} = require('./controllerPromisesErrors');
-const {internalServerError} = require('./controllerPromisesErrors');
+const {
+  badRequest,
+  notFound,
+  internalServerError,
+} = require('./controllerPromisesErrors');
 
 /**
- * get all users from the database User
- * @return {JSON} A JSON with all the objects User found
+ * Save user in the database
+ * @param {String} tag The tag of the user
+ * @param {User} user The user to save
+ * @return {User} The users saved
  */
-function getUsers() {
+function saveUser(tag, user) {
   return new Promise((resolve, reject) => {
-    User.find({}, (err, users) => {
-      if (err) reject(internalServerError('getUsers', err));
-      if (users.length === 0) reject(notFoundError('getUsers'));
-      resolve(users);
-    });
-  });
-}
-
-/**
- * get all active users from the database User
- * @return {JSON} A JSON with all the objects User found
- */
-function getActiveUsers() {
-  return new Promise((resolve, reject) => {
-    User.find({active: true}, (err, users) => {
-      if (err) reject(internalServerError('getActiveUsers', err));
-      if (users.length === 0) reject(notFoundError('getActiveUsers'));
-      resolve(users);
-    });
-  });
-}
-
-/**
- * get one user with the specify tag
- * @param {String} tag The tag from a user
- * @return {User} A object User
- */
-function getUserByTag(tag) {
-  return new Promise((resolve, reject) => {
-    if (!tag) reject(badRequestError('getUserByTag'));
+    if (!tag || !user || !user.tagname) {
+      reject(badRequest('saveUser', 'missing params'));
+      return;
+    }
 
     User.findOne({tag}, (err, user) => {
-      if (err) reject(internalServerError('getUserByTag', err));
-      if (!user) reject(notFoundError('getUserByTag'));
-      resolve(user);
+      if (err) {
+        reject(internalServerError('saveUser', err));
+        return;
+      }
+      if (user) {
+        reject(badRequest('saveUser', 'user already exist'));
+        return;
+      }
+
+      user.save((err, newUser) => {
+        if (err) {
+          reject(internalServerError('saveUser', err));
+          return;
+        }
+        resolve(newUser);
+      });
     });
   });
 }
@@ -57,16 +48,26 @@ function getUserByTag(tag) {
 function updateUser(tag, updateFields) {
   return new Promise((resolve, reject) => {
     if (!tag || updateFields.length === 0) {
-      reject(badRequestError('updateUser'));
+      reject(badRequest('updateUser', 'missing params'));
+      return;
     }
 
     User.findOne({tag}, (err, user) => {
-      if (err) reject(internalServerError('updateUser', err));
-      if (!user) reject(notFoundError('updateUser'));
+      if (err) {
+        reject(internalServerError('updateUser', err));
+        return;
+      }
+      if (!user) {
+        reject(notFound('updateUser', 'no user found'));
+        return;
+      }
 
       user.set(updateFields);
       user.save((err) => {
-        if (err) reject(internalServerError('updateUser', err));
+        if (err) {
+          reject(internalServerError('updateUser', err));
+          return;
+        }
         resolve(user);
       });
     });
@@ -74,31 +75,75 @@ function updateUser(tag, updateFields) {
 }
 
 /**
- * Save user in the database
- * @param {String} tag The tag of the user
- * @param {User} user The user to save
- * @return {User} The users saved
+ * get all users from the database User
+ * @return {JSON} A JSON with all the objects User found
  */
-function saveUser(tag, user) {
+function getUsers() {
   return new Promise((resolve, reject) => {
-    if (!tag || !user || !user.tagname) reject(badRequestError('saveUser'));
+    User.find({}, (err, users) => {
+      if (err) {
+        reject(internalServerError('getUsers', err));
+        return;
+      }
+      if (users.length === 0) {
+        reject(notFound('getUsers', 'no users found'));
+        return;
+      }
+      resolve(users);
+    });
+  });
+}
+
+/**
+ * get all active users from the database User
+ * @return {JSON} A JSON with all the objects User found
+ */
+function getActiveUsers() {
+  return new Promise((resolve, reject) => {
+    User.find({active: true}, (err, users) => {
+      if (err) {
+        reject(internalServerError('getActiveUsers', err));
+        return;
+      }
+      if (users.length === 0) {
+        reject(notFound('getActiveUsers', 'no users found'));
+        return;
+      }
+      resolve(users);
+    });
+  });
+}
+
+/**
+ * get one user with the specify tag
+ * @param {String} tag The tag from a user
+ * @return {User} A object User
+ */
+function getUserByTag(tag) {
+  return new Promise((resolve, reject) => {
+    if (!tag) {
+      reject(badRequest('getUserByTag'));
+      return;
+    }
 
     User.findOne({tag}, (err, user) => {
-      if (err) reject(internalServerError('saveUser', err));
-      if (!user) reject(badRequestError('saveUser'));
-
-      user.save((err, newUser) => {
-        if (err) reject(internalServerError('saveUser', err));
-        resolve(newUser);
-      });
+      if (err) {
+        reject(internalServerError('getUserByTag', err));
+        return;
+      }
+      if (!user) {
+        reject(notFound('getUserByTag'));
+        return;
+      }
+      resolve(user);
     });
   });
 }
 
 module.exports = {
+  saveUser,
+  updateUser,
   getUsers,
   getActiveUsers,
   getUserByTag,
-  updateUser,
-  saveUser,
 };
