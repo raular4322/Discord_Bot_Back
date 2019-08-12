@@ -41,7 +41,7 @@ function decrypt(text) {
 function generateToken(admin) {
   const payload = {
     sub: encrypt(admin.tag),
-    iat: moment.unix(),
+    iat: moment().unix(),
     exp: moment().add(config.EXP_DAYS, 'days').unix(),
   };
   return jwt.encode(payload, config.SECRET_TOKEN);
@@ -56,10 +56,6 @@ function decodeToken(token) {
   return new Promise((resolve, reject) => {
     try {
       const payload = jwt.decode(token, config.SECRET_TOKEN);
-      console.log(JSON.stringify(payload))
-      console.log(payload.exp)
-      console.log(moment().unix())
-      console.log(payload.exp <= moment().unix())
       if (payload.exp <= moment().unix()) reject(unauthorized('decodeToken'));
       const userTag = decrypt(payload.sub);
       resolve(userTag);

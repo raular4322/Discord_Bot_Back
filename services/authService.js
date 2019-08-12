@@ -23,7 +23,6 @@ function auth(req, res, next) {
 
   Token.decodeToken(token)
       .then((result) => {
-        console.log(result)
         Admin.findOne({tag: result}, (err, admin) => {
           if (err) return internalServerError('decodeToken');
           if (!admin) return unauthorized('decodeToken');
@@ -31,7 +30,6 @@ function auth(req, res, next) {
         });
       })
       .catch((err) => {
-        console.log(err)
         return res.send(err);
       });
 };
