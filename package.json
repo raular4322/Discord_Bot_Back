@@ -24,7 +24,8 @@
   "scripts": {
     "start": "nodemon index.js",
     "test-admin": "mocha ./tests/adminTest --timeout 10000 --exit",
-    "test": "npm test"
+    "test-user":"mocha ./tests/userTest --timeout 10000 --exit",
+    "test": "mocha ./tests/ --timeout 10000 --exit"
   },
   "repository": {
     "type": "git",

@@ -1,7 +1,7 @@
 const Token = require('./tokenService');
 const Admin = require('../models/adminModel');
 const {
-  badRequestError,
+  badRequest,
   unauthorized,
   internalServerError,
 } = require('../controllersPromises/controllerPromisesErrors');
@@ -17,7 +17,7 @@ function auth(req, res, next) {
   const {token} = req.headers;
 
   if (!token) {
-    const err = badRequestError('auth', 'missing token');
+    const err = badRequest('auth', 'missing token');
     return res.status(err.value).send(err.message);
   };
 

@@ -1,4 +1,5 @@
 const Admin = require('../models/adminModel');
+const config = require('../config');
 const {
   badRequest,
   unauthorized,
@@ -21,17 +22,17 @@ function loginAdmin(tag, password) {
 
     Admin.findOne({tag}, (err, admin) => {
       if (err) {
-        reject(internalServerError('loginAdmin'));
+        reject(internalServerError('loginAdmin', err));
         return;
       }
       if (!admin) {
-        reject(badRequest('loginAdmin'));
+        reject(badRequest('loginAdmin', 'admin not found'));
         return;
       }
 
       admin.comparePassword(password, (err, result) => {
         if (err) {
-          reject(internalServerError('loginAdmin'));
+          reject(internalServerError('loginAdmin', err));
           return;
         }
         if (!result) {
@@ -48,12 +49,17 @@ function loginAdmin(tag, password) {
  * Save admin in the database
  * @param {String} tag The tag of the admin
  * @param {Admin} adminToSave The admin to save
+ * @param {String} masterKey The security key
  * @return {Admin} The admins saved
  */
-function saveAdmin(tag, adminToSave) {
+function saveAdmin(tag, adminToSave, masterKey) {
   return new Promise((resolve, reject) => {
-    if (!tag || !adminToSave || !adminToSave.tagname) {
+    if (!tag || !adminToSave || !adminToSave.tagname || !masterKey) {
       reject(badRequest('saveAdmin', 'missing params'));
+      return;
+    }
+    if (masterKey != config.MASTERKEY) {
+      reject(unauthorized('saveAdmin', 'invalid masterKey'));
       return;
     }
 

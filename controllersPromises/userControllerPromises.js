@@ -8,12 +8,12 @@ const {
 /**
  * Save user in the database
  * @param {String} tag The tag of the user
- * @param {User} user The user to save
+ * @param {User} userToSave The user to save
  * @return {User} The users saved
  */
-function saveUser(tag, user) {
+function saveUser(tag, userToSave) {
   return new Promise((resolve, reject) => {
-    if (!tag || !user || !user.tagname) {
+    if (!tag || !userToSave || !userToSave.tagname) {
       reject(badRequest('saveUser', 'missing params'));
       return;
     }
@@ -28,7 +28,7 @@ function saveUser(tag, user) {
         return;
       }
 
-      user.save((err, newUser) => {
+      userToSave.save((err, newUser) => {
         if (err) {
           reject(internalServerError('saveUser', err));
           return;

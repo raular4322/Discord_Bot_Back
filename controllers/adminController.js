@@ -12,19 +12,18 @@ function login(req, res) {
   const {password} = req.body;
   const {masterKey} = req.body;
 
-  if (masterKey === config.MASTERKEY) {
-    adminPromises.loginAdmin(tag, password)
-        .then((admin) => {
-          const response = {
-            admin,
-            token: Token.generateToken(admin),
-          };
-          return res.send(response);
-        })
-        .catch((err) => {
-          return res.status(err.value).send(err.message);
-        });
-  }
+  adminPromises.loginAdmin(tag, password)
+      .then((admin) => {
+        const response = {
+          admin,
+          token: Token.generateToken(admin),
+        };
+        return res.send(response);
+      })
+      .catch((err) => {
+        return res.status(err.value).send(err.message);
+      });
+
 }
 
 /**
@@ -37,7 +36,7 @@ function signUp(req, res) {
   const {tag} = req.body;
   const {tagname} = req.body;
   const {password} = req.body;
-
+  const {masterKey} = req.body;
   const newAdmin = new Admin({
     nickname,
     tag,
@@ -45,7 +44,7 @@ function signUp(req, res) {
     password,
   });
 
-  adminPromises.saveAdmin(tag, newAdmin)
+  adminPromises.saveAdmin(tag, newAdmin, masterKey)
       .then((response) => {
         return res.send(response);
       })
@@ -68,6 +67,7 @@ function updateAdmin(req, res) {
   const {kicks} = req.body;
   const {bans} = req.body;
   const {password} = req.body;
+  const updatedFields = {}
 
   if (nickname) updatedFields.nickname = nickname;
   if (tagname) updatedFields.tagname = tagname;
