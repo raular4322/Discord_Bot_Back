@@ -19,7 +19,7 @@ function auth(req, res, next) {
       .then((result) => {
         Admin.findOne({tag: result}, (err, admin) => {
           if (err) {
-            return res.status(500).send({message: `Internal server error ${err}`});
+            return res.status(500).send({message: `Server error: ${err}`});
           }
           if (!admin) return res.status(401).send({message: 'unauthorized'});
           next();
