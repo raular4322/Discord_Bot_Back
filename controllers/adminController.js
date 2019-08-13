@@ -1,5 +1,4 @@
 const Admin = require('../models/adminModel');
-const adminPromises = require('../controllersPromises/adminControllerPromises');
 const Token = require('../services/tokenService');
 const config = require('../config');
 

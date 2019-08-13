@@ -1,10 +1,5 @@
 const Token = require('./tokenService');
 const Admin = require('../models/adminModel');
-const {
-  badRequest,
-  unauthorized,
-  internalServerError,
-} = require('../controllersPromises/controllerPromisesErrors');
 
 /**
  * Checks if the token provided is valid
@@ -17,15 +12,16 @@ function auth(req, res, next) {
   const {token} = req.headers;
 
   if (!token) {
-    const err = badRequest('auth', 'missing token');
-    return res.status(err.value).send(err.message);
+    return res.status(400).send({message: 'Missing params'});
   };
 
   Token.decodeToken(token)
       .then((result) => {
         Admin.findOne({tag: result}, (err, admin) => {
-          if (err) return internalServerError('decodeToken');
-          if (!admin) return unauthorized('decodeToken');
+          if (err) {
+            return res.status(500).send({message: `Internal server error ${err}`});
+          }
+          if (!admin) return res.status(401).send({message: 'unauthorized'});
           next();
         });
       })

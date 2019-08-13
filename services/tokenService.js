@@ -2,10 +2,6 @@ const crypto = require('crypto');
 const config = require('../config');
 const jwt = require('jwt-simple');
 const moment = require('moment');
-const {
-  badRequestError,
-  unauthorized,
-} = require('../controllersPromises/controllerPromisesErrors');
 
 /**
  * Encrypts the text
@@ -60,7 +56,7 @@ function decodeToken(token) {
       const userTag = decrypt(payload.sub);
       resolve(userTag);
     } catch (err) {
-      reject(badRequestError('decodeToken'));
+      reject(err);
     }
   });
 };
