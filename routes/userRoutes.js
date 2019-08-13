@@ -4,9 +4,9 @@ const {auth} = require('../services/authService');
 
 const api = new express.Router();
 
-api.post('/signup', auth, userController.signUp);
-api.put('/update', auth, userController.updateUser);
-api.get('/all', auth, userController.getUsers);
+api.get('/', auth, userController.getUsers);
 api.get('/:tag', auth, userController.getUser);
+api.post('/', auth, userController.signUp);
+api.patch('/:tag', auth, userController.updateUser);
 
 module.exports = api;

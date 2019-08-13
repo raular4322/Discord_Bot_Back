@@ -26,18 +26,7 @@ before((done) => {
 });
 
 describe('Check login function of adminController.js', () => {
-  it('Should return 400 if no params are send', (done) => {
-    const body = {};
-    chai.request(serverURL)
-        .post('/admin/login')
-        .send(body)
-        .end((err, res) => {
-          expect(res).to.have.status(400);
-          done();
-        });
-  });
-
-  it('Should return 400 if admin not found', (done) => {
+  it('Should return 404 if admin not found', (done) => {
     const body = {
       nickname: 'test1',
       tag: '0001',
@@ -45,10 +34,10 @@ describe('Check login function of adminController.js', () => {
       password: '0000',
     };
     chai.request(serverURL)
-        .post('/admin/login')
+        .post('/admin/' + body.tag)
         .send(body)
         .end((err, res) => {
-          expect(res).to.have.status(400);
+          expect(res).to.have.status(404);
           done();
         });
   });
@@ -61,7 +50,7 @@ describe('Check login function of adminController.js', () => {
       password: '1111',
     };
     chai.request(serverURL)
-        .post('/admin/login')
+        .post('/admin/' + body.tag)
         .send(body)
         .end((err, res) => {
           expect(res).to.have.status(401);
@@ -77,7 +66,7 @@ describe('Check login function of adminController.js', () => {
       password: '0000',
     };
     chai.request(serverURL)
-        .post('/admin/login')
+        .post('/admin/' + body.tag)
         .send(body)
         .end((err, res) => {
           expect(res).to.have.status(200);
@@ -91,7 +80,7 @@ describe('Check signup function of adminController.js', () => {
   it('Should return 400 if no params are send', (done) => {
     const body = {};
     chai.request(serverURL)
-        .post('/admin/signup')
+        .post('/admin/')
         .send(body)
         .end((err, res) => {
           expect(res).to.have.status(400);
@@ -100,12 +89,18 @@ describe('Check signup function of adminController.js', () => {
   });
 
   it('Should return 401 if masterKey is not valid', (done) => {
-    const body = {masterKey: config.MASTERKEY};
+    const body = {
+      nickname: 'testAdmin1',
+      tag: '1000',
+      tagname: 'test#0000',
+      password: '0000',
+      masterKey: 'thisIsNotAValidMasterKey',
+    };
     chai.request(serverURL)
-        .post('/admin/signup')
+        .post('/admin/')
         .send(body)
         .end((err, res) => {
-          expect(res).to.have.status(400);
+          expect(res).to.have.status(401);
           done();
         });
   });
@@ -119,10 +114,10 @@ describe('Check signup function of adminController.js', () => {
       masterKey: config.MASTERKEY,
     };
     chai.request(serverURL)
-        .post('/admin/signup')
+        .post('/admin/')
         .send(body)
         .end((err, res) => {
-          expect(res).to.have.status(400);
+          expect(res).to.have.status(409);
           done();
         });
   });
@@ -136,7 +131,7 @@ describe('Check signup function of adminController.js', () => {
       masterKey: config.MASTERKEY,
     };
     chai.request(serverURL)
-        .post('/admin/signup')
+        .post('/admin/')
         .send(body)
         .end((err, res) => {
           expect(res).to.have.status(200);
@@ -148,18 +143,6 @@ describe('Check signup function of adminController.js', () => {
 });
 
 describe('Check updateAdmin function of adminController,js', () => {
-  it('Should return 400 if missing params', (done) => {
-    const body = {};
-    chai.request(serverURL)
-        .put('/admin/update')
-        .set('token', token)
-        .send(body)
-        .end((err, res) => {
-          expect(res).to.have.status(400);
-          done();
-        });
-  });
-
   it('Should return 404 if no admin found', (done) => {
     const body = {
       nickname: 'test2',
@@ -168,7 +151,7 @@ describe('Check updateAdmin function of adminController,js', () => {
       password: '0000',
     };
     chai.request(serverURL)
-        .put('/admin/update')
+        .patch('/admin/' + body.tag)
         .set('token', token)
         .send(body)
         .end((err, res) => {
@@ -185,7 +168,7 @@ describe('Check updateAdmin function of adminController,js', () => {
       password: '0000',
     };
     chai.request(serverURL)
-        .put('/admin/update')
+        .patch('/admin/' + body.tag)
         .set('token', token)
         .send(body)
         .end((err, res) => {
@@ -198,7 +181,7 @@ describe('Check updateAdmin function of adminController,js', () => {
 describe('Check getAdmins', () => {
   it('Should return 200 if all goes well', (done) => {
     chai.request(serverURL)
-        .get('/admin/all')
+        .get('/admin/')
         .set('token', token)
         .end((err, res) => {
           expect(res).to.have.status(200);

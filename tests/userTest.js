@@ -1,6 +1,5 @@
 const User = require('../models/userModel');
 const Admin = require('../models/adminModel');
-const config = require('../config');
 const mongoose = require('mongoose');
 const {expect} = require(`chai`);
 const chai = require('chai');
@@ -46,7 +45,7 @@ describe('Check login function of adminController.js', () => {
       password: '0000',
     };
     chai.request(serverURL)
-        .post('/admin/login')
+        .post('/admin/' + body.tag)
         .send(body)
         .end((err, res) => {
           expect(res).to.have.status(200);
@@ -60,7 +59,7 @@ describe('Check signup function of UserController.js', () => {
   it('Should return 400 if no params are send', (done) => {
     const body = {};
     chai.request(serverURL)
-        .post('/user/signup')
+        .post('/user/')
         .set('token', token)
         .send(body)
         .end((err, res) => {
@@ -76,11 +75,11 @@ describe('Check signup function of UserController.js', () => {
       tagname: 'test#0000',
     };
     chai.request(serverURL)
-        .post('/user/signup')
+        .post('/user/')
         .set('token', token)
         .send(body)
         .end((err, res) => {
-          expect(res).to.have.status(400);
+          expect(res).to.have.status(409);
           done();
         });
   });
@@ -92,7 +91,7 @@ describe('Check signup function of UserController.js', () => {
       tagname: 'test2#0002',
     };
     chai.request(serverURL)
-        .post('/user/signup')
+        .post('/user/')
         .set('token', token)
         .send(body)
         .end((err, res) => {
@@ -104,19 +103,7 @@ describe('Check signup function of UserController.js', () => {
   });
 });
 
-describe('Check updateUser function of UserController,js', () => {
-  it('Should return 400 if missing params', (done) => {
-    const body = {};
-    chai.request(serverURL)
-        .put('/user/update')
-        .set('token', token)
-        .send(body)
-        .end((err, res) => {
-          expect(res).to.have.status(400);
-          done();
-        });
-  });
-
+describe('Check updateUser function of UserController.js', () => {
   it('Should return 404 if no User found', (done) => {
     const body = {
       nickname: 'test2',
@@ -125,7 +112,7 @@ describe('Check updateUser function of UserController,js', () => {
       password: '0000',
     };
     chai.request(serverURL)
-        .put('/user/update')
+        .patch('/user/' + body.tag)
         .set('token', token)
         .send(body)
         .end((err, res) => {
@@ -142,7 +129,7 @@ describe('Check updateUser function of UserController,js', () => {
       password: '0000',
     };
     chai.request(serverURL)
-        .put('/user/update')
+        .patch('/user/' + body.tag)
         .set('token', token)
         .send(body)
         .end((err, res) => {
@@ -152,10 +139,10 @@ describe('Check updateUser function of UserController,js', () => {
   });
 });
 
-describe('Check getUsers', () => {
+describe('Check getUsers function of UserController.js', () => {
   it('Should return 200 if all goes well', (done) => {
     chai.request(serverURL)
-        .get('/user/all')
+        .get('/user/')
         .set('token', token)
         .end((err, res) => {
           expect(res).to.have.status(200);
@@ -164,7 +151,7 @@ describe('Check getUsers', () => {
   });
 });
 
-describe('Check getUserByTag', () => {
+describe('Check getUserByTag function of UserController.js', () => {
   it('Should return 200 if all goes well', (done) => {
     chai.request(serverURL)
         .get('/user/' + testUser.tag)
