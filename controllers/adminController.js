@@ -1,5 +1,5 @@
 const Admin = require('../models/adminModel');
-const Token = require('../services/tokenService');
+const Token = require('../middleware/tokenService');
 const config = require('../config');
 
 /**
